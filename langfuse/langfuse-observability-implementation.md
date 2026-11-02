@@ -1,5 +1,40 @@
 # Langfuse Observability 实现分析
 
+## 目录
+
+- [1. 概述](#1-概述)
+- [2. 核心概念](#2-核心概念)
+  - [2.1 数据模型层次](#21-数据模型层次)
+  - [2.2 Observation 层级关系](#22-observation-层级关系)
+  - [2.3 Observation 字段详解](#23-observation-字段详解)
+- [3. 系统架构](#3-系统架构)
+  - [3.1 整体架构图](#31-整体架构图)
+- [4. 数据摄入流程](#4-数据摄入流程)
+  - [4.1 Ingestion 流程](#41-ingestion-流程)
+  - [4.2 OpenTelemetry 摄入流程](#42-opentelemetry-摄入流程)
+- [5. 查询架构](#5-查询架构)
+  - [5.1 数据查询流程](#51-数据查询流程)
+  - [5.2 ClickHouse Schema](#52-clickhouse-schema)
+- [6. 事件类型](#6-事件类型)
+  - [6.1 Ingestion Event Types](#61-ingestion-event-types)
+- [7. 成本计算](#7-成本计算)
+  - [7.1 Model Matching & Cost Calculation](#71-model-matching--cost-calculation)
+- [8. Trace 处理与评估触发](#8-trace-处理与评估触发)
+  - [8.1 Trace Upsert 流程](#81-trace-upsert-流程)
+- [9. 关键组件索引](#9-关键组件索引)
+  - [9.1 Web API 层](#91-web-api-层)
+  - [9.2 Worker 层](#92-worker-层)
+  - [9.3 Shared 层](#93-shared-层)
+  - [9.4 UI 层](#94-ui-层)
+- [10. 性能优化](#10-性能优化)
+  - [10.1 写入优化](#101-写入优化)
+  - [10.2 查询优化](#102-查询优化)
+- [11. 监控与指标](#11-监控与指标)
+- [12. 环境变量配置](#12-环境变量配置)
+- [附录：完整数据摄入时序图](#附录完整数据摄入时序图)
+
+---
+
 ## 1. 概述
 
 Langfuse 的 Observability（可观测性）系统是一个专为 LLM 应用设计的追踪和监控系统，支持 OpenTelemetry 协议，提供 Trace、Observation、Score 等核心概念来记录和分析 LLM 应用的执行过程。
